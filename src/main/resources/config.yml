@@ -1,0 +1,57 @@
+# Faction Map configuration. See CONFIG.md for every option.
+
+# The world the map shows. One world per server in this version; the Nether and the End are not mapped.
+world: world
+
+web:
+  # The built-in web server that serves the map viewer and its tiles.
+  enabled: true
+  # 127.0.0.1 keeps the map private to this machine. To show it to players, put it behind your
+  # reverse proxy (nginx, Caddy...) or set this to 0.0.0.0, which exposes it on every interface.
+  host: 127.0.0.1
+  port: 8199
+
+capture:
+  # Most main-thread time, in microseconds, the plugin spends per tick reading chunks. A tick is 50,000.
+  mainThreadBudgetMicros: 500
+  # After a block change, wait for this much quiet before re-reading the chunk...
+  debounceMillis: 1000
+  # ...but never longer than this after the first change.
+  maxDelayMillis: 5000
+  # Loaded chunks re-read per second, round-robin. Catches changes that fire no event
+  # (/fill, WorldEdit, some redstone). 0 turns the sweep off.
+  sweepChunksPerSecond: 2
+
+factions:
+  # Show faction names on the map. false replaces them with "Faction A", "Faction B"...
+  showNames: true
+  # Show faction homes on the map.
+  showHomes: false
+  # Re-read Medieval Factions this often, in seconds. Some changes fire no event
+  # (/f unclaimall, colour changes), so this is how long they can take to appear.
+  pollSeconds: 30
+
+# Usage reporting. When the plugin is enabled, a small event (plugin name,
+# event name, plugin version) is sent to the author's trace server so it is
+# known which plugins are actually in use. Each event also carries a random
+# server ID (the server-id line in plugins/trace/config.yml) so servers can be
+# counted; it identifies no person, account or IP address. Nothing about
+# players is included, and nothing else about the server apart from any tags
+# added under tags: in plugins/trace/config.yml. Sending happens off the main
+# thread, never blocks a tick, and is dropped silently if the server cannot be
+# reached. Set enabled to false to turn it off for this plugin. To turn it off
+# for every plugin on this server that reports to trace, set enabled to false
+# in plugins/trace/config.yml (created on first start); the environment
+# variables TRACE_USAGE_REPORTING=off and DO_NOT_TRACK=1 do the same for the
+# whole server process. The plugin says on the console at every start whether
+# reporting is on. Details:
+# https://danielstephenson.dev/usage-reporting
+usage-reporting:
+  enabled: true
+  endpoint: https://trace.danielstephenson.dev
+  # The key identifies this plugin to the trace server, so reports are
+  # attributed to Faction Map and can be revoked as a group if they are ever
+  # abused. It is not a secret -- it ships in this file on every server that
+  # runs the plugin -- and it cannot do anything except report as this
+  # plugin. Empty means reporting is off regardless of the switch above.
+  key: ""

@@ -1,0 +1,9 @@
+{
+  "name": "faction-map-smoke",
+  "private": true,
+  "description": "Bots for the Faction Map smoke and performance gate (local throwaway servers only).",
+  "license": "GPL-3.0-only",
+  "dependencies": {
+    "mineflayer": "4.39.0"
+  }
+}

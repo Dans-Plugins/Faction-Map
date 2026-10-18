@@ -1,0 +1,49 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # Compiles (fetching the Medieval Factions release jar the integration compiles against, checked
+      # by SHA-256) and runs the unit tests.
+      - name: Build with Gradle
+        run: ./gradlew clean build
+
+      # The plugin's contract is that it only reads the world and Medieval Factions. This checks the
+      # jar's bytecode: only LoadedChunkReader touches World/Chunk/Block, and only through allow-listed
+      # reads, after isChunkLoaded; Medieval Factions only through allow-listed getters; no database,
+      # no HTTP outside the usage-reporting client. The self-test first proves every rule still fires.
+      - name: Read-only check (bytecode allow-list)
+        run: |
+          python3 scripts/check_read_only.py --self-test
+          python3 scripts/check_read_only.py build/libs
+
+      # Every Bukkit class, field and method the jar uses must exist on each Minecraft
+      # version in minecraft-versions.json, and its bytecode must fit the Java each runs on.
+      # See https://github.com/Dans-Plugins/release-gates#api-compatibility-check
+      - name: Check Bukkit API use against every supported Minecraft version
+        run: |
+          curl -fsSL -o /tmp/check_api_compat.py \
+            https://raw.githubusercontent.com/Dans-Plugins/release-gates/v23/gates/check_api_compat.py
+          python3 /tmp/check_api_compat.py --versions minecraft-versions.json target build/libs

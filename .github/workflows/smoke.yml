@@ -1,0 +1,136 @@
+name: Smoke
+
+# Boots the plugin on a throwaway Spigot 26.3 server in the runner, with Medieval Factions 7.0.0 and
+# four mineflayer bots that create factions, claims and relations, then measures the performance
+# budget from RFC 0002 (tools/smoke/gate.py): p99 main-thread time per tick <= 1 ms and no tick
+# above 5 ms after warm-up, and block change -> tile served <= 3 s (median of TNT trials).
+#
+# Usage reporting, bStats and the plugins' trace clients are switched off before the first boot.
+# The Spigot build (BuildTools, ~10 minutes) is cached per Minecraft version.
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Smoke (mc 26.3)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      MINECRAFT_VERSION: '26.3'
+      VIA_VERSION: '5.12.1'
+      RCON_PASSWORD: smoke-local-only
+      TRACE_USAGE_REPORTING: 'off'
+      DO_NOT_TRACK: '1'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25 (server) and 21 (plugin build)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: |
+            21
+            25
+
+      - name: Build the plugin
+        run: |
+          chmod +x gradlew
+          JAVA_HOME="$JAVA_HOME_21_X64" ./gradlew --no-daemon build -x test
+
+      - name: Cache the Spigot server jar
+        id: spigot-cache
+        uses: actions/cache@v4
+        with:
+          path: spigot-cache
+          key: spigot-${{ env.MINECRAFT_VERSION }}-v1
+
+      - name: Build Spigot with BuildTools
+        if: steps.spigot-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p bt spigot-cache
+          cd bt
+          curl -fsSL -o BuildTools.jar https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
+          JAVA_HOME="$JAVA_HOME_25_X64" PATH="$JAVA_HOME_25_X64/bin:$PATH" MAVEN_SKIP_RC=1 \
+            java -Xmx2G -jar BuildTools.jar --rev "$MINECRAFT_VERSION" --compile SPIGOT --output-dir ../spigot-cache > buildtools.log 2>&1 \
+            || { tail -50 buildtools.log; exit 1; }
+          ls -la ../spigot-cache
+
+      - name: Prepare the throwaway server (telemetry off before first boot)
+        run: |
+          mkdir -p server/plugins/trace server/plugins/bStats server/plugins/FactionMap
+          cp spigot-cache/spigot-*.jar server/server.jar
+          cp libs/medieval-factions-*-all.jar build/libs/FactionMap-*.jar server/plugins/
+          for r in ViaVersion ViaBackwards; do
+            curl -fsSL -o "server/plugins/$r-$VIA_VERSION.jar" "https://github.com/ViaVersion/$r/releases/download/$VIA_VERSION/$r-$VIA_VERSION.jar"
+          done
+          printf 'enabled: false\n' > server/plugins/trace/config.yml
+          printf 'enabled: false\nserverUuid: 00000000-0000-0000-0000-000000000000\nlogFailedRequests: false\n' > server/plugins/bStats/config.yml
+          echo eula=true > server/eula.txt
+          cat > server/server.properties <<PROPS
+          online-mode=false
+          server-ip=127.0.0.1
+          server-port=25620
+          enable-rcon=true
+          rcon.port=25621
+          rcon.password=$RCON_PASSWORD
+          level-seed=8675309
+          view-distance=10
+          simulation-distance=8
+          spawn-protection=0
+          white-list=false
+          enforce-secure-profile=false
+          PROPS
+          sed -i 's/^ *//' server/server.properties
+
+      - name: Start the server
+        run: |
+          cd server
+          nohup "$JAVA_HOME_25_X64/bin/java" -Xms2G -Xmx4G -jar server.jar nogui < /dev/null > console.log 2>&1 &
+          for i in $(seq 1 120); do grep -q 'Done (' console.log && break; sleep 2; done
+          grep -E 'Done \(|FactionMap|Usage reporting' console.log
+          grep -q 'Done (' console.log
+          if grep -q 'Usage reporting is on' console.log; then echo 'usage reporting must be off on the smoke server' >&2; exit 1; fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Bots create factions, claims and relations
+        working-directory: tools/smoke
+        run: |
+          npm ci --no-audit --no-fund
+          python3 rcon.py "whitelist off"
+          nohup node bots.js setup > ../../server/bots.log 2>&1 &
+          for i in $(seq 1 120); do grep -q 'SETUP DONE' ../../server/bots.log && break; sleep 2; done
+          cat ../../server/bots.log | grep -v ' MSG \(Northreach\|Saltmarsh\|Emberfall\|Hollowmere\)$'
+          grep -q 'SETUP DONE' ../../server/bots.log
+
+      - name: Measure the performance budget
+        working-directory: tools/smoke
+        run: python3 gate.py --data-dir ../../server/plugins/FactionMap --steady-seconds 300 --trials 6 --out ../../server/gate.json
+
+      - name: Upload server log and results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-${{ env.MINECRAFT_VERSION }}
+          path: |
+            server/console.log
+            server/bots.log
+            server/gate.json
+            server/plugins/FactionMap/stats.json
+            server/plugins/FactionMap/web/tiles/index.json
+          if-no-files-found: warn

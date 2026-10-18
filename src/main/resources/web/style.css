@@ -1,0 +1,61 @@
+:root {
+  --bg: #cfe3f2; --panel: rgba(255,255,255,0.93); --ink: #1d232b; --muted: #55606c;
+  --line: rgba(0,0,0,0.14); --accent: #2f6fb0; --chip: #eef2f6;
+  --ally: #2f8a50; --war: #c42f27; --vassal: #a8861c;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161c; --panel: rgba(22,27,34,0.93); --ink: #e6edf3; --muted: #9aa6b2;
+    --line: rgba(255,255,255,0.14); --accent: #6fa8e0; --chip: #232a33;
+    --ally: #5cc483; --war: #f0665e; --vassal: #e0be4f;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161c; --panel: rgba(22,27,34,0.93); --ink: #e6edf3; --muted: #9aa6b2;
+  --line: rgba(255,255,255,0.14); --accent: #6fa8e0; --chip: #232a33;
+  --ally: #5cc483; --war: #f0665e; --vassal: #e0be4f;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
+  font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; overflow: hidden; }
+#view { position: fixed; inset: 0; width: 100%; height: 100%; touch-action: none; display: block; }
+#panel { position: fixed; top: 12px; left: 12px; width: 290px; max-height: calc(100% - 24px); overflow: auto;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
+  backdrop-filter: blur(6px); }
+.head { display: flex; align-items: flex-start; gap: 8px; }
+.head > div { flex: 1; min-width: 0; }
+h1 { font-size: 15px; margin: 0 0 2px; }
+.sub { color: var(--muted); font-size: 12px; }
+h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 0 6px; }
+.row { display: flex; align-items: center; gap: 8px; }
+label.row { cursor: pointer; margin: 4px 0; min-height: 24px; flex-wrap: wrap; }
+.rel { font-weight: 600; }
+.rel.ally { color: var(--ally); } .rel.war { color: var(--war); } .rel.vassal { color: var(--vassal); }
+.legend button { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 4px 6px; border-radius: 6px; min-height: 28px; }
+.legend button:hover, .legend button:focus-visible { background: var(--chip); }
+.legend button:focus-visible { outline: 2px solid var(--accent); }
+.legend .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sw { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--line); flex: none; }
+.num { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; white-space: nowrap; }
+.note { color: var(--muted); font-size: 11px; margin: 0 0 4px 28px; }
+.foot { color: var(--muted); font-size: 11px; margin: 12px 0 0; }
+#toggle { display: none; font: inherit; color: var(--ink); background: var(--chip); border: 1px solid var(--line);
+  border-radius: 6px; padding: 4px 10px; min-height: 32px; }
+#hud { position: fixed; right: 12px; bottom: 12px; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 8px; padding: 6px 10px; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+#labels { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+.flabel { position: absolute; transform: translate(-50%, -100%); white-space: nowrap; display: flex; align-items: center; gap: 6px;
+  background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 2px 7px;
+  font-weight: 600; font-size: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.15); max-width: 220px; }
+.flabel span:last-child { overflow: hidden; text-overflow: ellipsis; }
+.flabel .sw { width: 10px; height: 10px; }
+#nogl, #empty { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 24px;
+  text-align: center; color: var(--muted); pointer-events: none; }
+#nogl[hidden], #empty[hidden] { display: none; }
+@media (max-width: 640px) {
+  #panel { left: 8px; right: 8px; top: auto; bottom: 8px; width: auto; max-height: 50%; }
+  #panel.collapsed #panel-body { display: none; }
+  #toggle { display: inline-block; }
+  #hud { top: 8px; bottom: auto; right: 8px; }
+}

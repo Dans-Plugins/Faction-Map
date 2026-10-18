@@ -1,0 +1,93 @@
+import java.security.MessageDigest
+
+plugins {
+    id 'java'
+}
+
+group = 'com.dansplugins'
+base {
+    archivesName = 'FactionMap'
+}
+version = '0.1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'spigotmc-repo'
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+    }
+}
+
+// Medieval Factions publishes no API artifact, and repo.dansplugins.com stops at 5.7.2, so the plugin
+// compiles against MF's released -all jar, the way Bluemap_MedievalFactions does. The jar is fetched
+// from MF's GitHub release and checked against its SHA-256 instead of being committed (it is 17 MB).
+// It is compileOnly: Faction Map never bundles MF, and runs without it (terrain only).
+def mfVersion = '7.0.0'
+def mfSha256 = '32e0449d56ef0800f1616458159ba7f39d363d6737a48733a9b61905ce12e231'
+def mfJar = layout.projectDirectory.file("libs/medieval-factions-${mfVersion}-all.jar").asFile
+
+tasks.register('fetchMedievalFactions') {
+    description = 'Downloads the Medieval Factions release jar that the MF integration compiles against.'
+    outputs.file(mfJar)
+    doLast {
+        def sha = { File f -> MessageDigest.getInstance('SHA-256').digest(f.bytes).encodeHex().toString() }
+        if (mfJar.exists() && sha(mfJar) == mfSha256) {
+            return
+        }
+        mfJar.parentFile.mkdirs()
+        def url = "https://github.com/Dans-Plugins/Medieval-Factions/releases/download/v${mfVersion}/medieval-factions-${mfVersion}-all.jar"
+        logger.lifecycle("Downloading ${url}")
+        def part = new File(mfJar.path + '.part')
+        new URL(url).withInputStream { input -> part.withOutputStream { it << input } }
+        def actual = sha(part)
+        if (actual != mfSha256) {
+            part.delete()
+            throw new GradleException("Medieval Factions ${mfVersion} jar has SHA-256 ${actual}, expected ${mfSha256}")
+        }
+        part.renameTo(mfJar)
+    }
+}
+
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.21.11-R0.1-SNAPSHOT'
+    compileOnly files(mfJar)
+
+    // The Spigot API is compileOnly above, so it is repeated here to put it (and its Gson) on the test classpath.
+    testImplementation 'org.spigotmc:spigot-api:1.21.11-R0.1-SNAPSHOT'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('compileJava') {
+    dependsOn 'fetchMedievalFactions'
+}
+
+// 21: the oldest Minecraft version in minecraft-versions.json (1.21.11) runs on Java 21.
+def targetJavaVersion = 21
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release.set(targetJavaVersion)
+    options.compilerArgs << '-Xlint:all,-processing,-serial'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
