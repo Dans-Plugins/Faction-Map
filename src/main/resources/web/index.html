@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Faction Map</title>
+<meta name="description" content="A 3D map of the server's world with Medieval Factions territories, borders and relations.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="view" aria-label="3D map of the world"></canvas>
+<div id="labels" aria-hidden="true"></div>
+<div id="nogl" hidden>This map needs WebGL, which this browser has turned off or does not support.</div>
+<div id="empty" hidden>No part of the world has been mapped yet. The map fills in as players explore; it never loads chunks by itself.</div>
+<section id="panel" aria-label="Map controls">
+  <div class="head">
+    <div>
+      <h1>Faction Map</h1>
+      <div class="sub" id="sub">Loading…</div>
+    </div>
+    <button type="button" id="toggle" aria-expanded="true" aria-controls="panel-body">Hide</button>
+  </div>
+  <div id="panel-body">
+    <h2>Layers</h2>
+    <label class="row"><input type="checkbox" id="tint" checked> Territory tint</label>
+    <label class="row"><input type="checkbox" id="borders" checked> Claim borders</label>
+    <label class="row"><input type="checkbox" id="names" checked> Faction names</label>
+    <label class="row"><input type="checkbox" id="rels" checked> Relations:
+      <span class="rel ally">ally</span> · <span class="rel war">war</span> · <span class="rel vassal">vassal</span></label>
+    <div id="factions-section">
+      <h2>Factions</h2>
+      <div class="legend" id="legend"></div>
+    </div>
+    <p class="foot" id="foot"></p>
+  </div>
+</section>
+<div id="hud" aria-live="off">–</div>
+<script src="vendor/three.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

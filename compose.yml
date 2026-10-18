@@ -1,0 +1,22 @@
+services:
+  testmcserver:
+    build:
+      context: .
+      args:
+        MINECRAFT_VERSION: ${MINECRAFT_VERSION:-26.3}
+    image: factionmap-test-mc-server
+    container_name: factionmap-test-mc-server
+    ports:
+      - "25565:25565"
+      - "127.0.0.1:8199:8199"
+    volumes:
+      - type: bind
+        source: ./testmcserver # note: might need to create this directory before running
+        target: /testmcserver
+    environment:
+      - MINECRAFT_VERSION=${MINECRAFT_VERSION:-26.3}
+      - OPERATOR_UUID=${OPERATOR_UUID}
+      - OPERATOR_NAME=${OPERATOR_NAME}
+      - OPERATOR_LEVEL=${OPERATOR_LEVEL}
+      - OVERWRITE_EXISTING_SERVER=${OVERWRITE_EXISTING_SERVER}
+      - TRACE_USAGE_REPORTING=${TRACE_USAGE_REPORTING:-off}

@@ -1,0 +1,17 @@
+name: FactionMap
+version: '${version}'
+main: com.dansplugins.factionmap.FactionMap
+api-version: '1.21'
+softdepend: [MedievalFactions]
+authors: ["Daniel McCoy Stephenson"]
+description: A read-only 3D map of the world's surface with Medieval Factions territories, borders and relations.
+website: https://github.com/Dans-Plugins/Faction-Map
+commands:
+  fmap:
+    description: Faction Map status and performance figures.
+    usage: /fmap [status|stats|reset|recapture]
+    permission: factionmap.admin
+permissions:
+  factionmap.admin:
+    description: Use /fmap.
+    default: op

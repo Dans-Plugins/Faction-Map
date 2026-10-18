@@ -1,0 +1,11 @@
+.gradle/
+build/
+libs/
+out/
+.idea/
+*.iml
+.env
+.vscode/
+tools/smoke/node_modules/
+tools/smoke/work/
+__pycache__/
