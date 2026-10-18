@@ -83,9 +83,9 @@ If you see `BUILD SUCCESSFUL`, the tests have passed. The build downloads the Me
 
 ### Smoke and performance gate
 
-[`tools/smoke/`](tools/smoke/) boots the plugin on a throwaway Spigot 26.3 server with Medieval Factions and four [mineflayer](https://github.com/PrismarineJS/mineflayer) bots, which create factions, claims and relations. [`gate.py`](tools/smoke/gate.py) then measures the performance budget: p99 main-thread time per tick ≤ 1 ms with no tick above 5 ms after warm-up, and a block change reaching the served tile in ≤ 3 s. The `Smoke` workflow runs it in GitHub Actions on every pull request. Usage reporting and bStats are switched off on that server before its first boot.
+[`tools/smoke/`](tools/smoke/) boots the plugin on a throwaway Spigot 26.3 server with Medieval Factions and four [mineflayer](https://github.com/PrismarineJS/mineflayer) bots, which create factions, claims and relations; the areas around their faction sites are force-loaded. [`gate.py`](tools/smoke/gate.py) then measures the performance budget: p99 main-thread time per tick ≤ 1 ms with no tick above 5 ms after warm-up, and a block change reaching the served tile in ≤ 3 s. The `Smoke` workflow runs it in GitHub Actions on every pull request. Usage reporting and bStats are switched off on that server before its first boot.
 
-Measured on a local throwaway server: Spigot 26.3 on Temurin 25, Medieval Factions 7.0.0, 4 bots holding ~1,480 chunks loaded, 4 factions with 84 claims and one alliance, war and vassalage each. Development machine, not a production host; two runs on 2026-10-18:
+Measured on a local throwaway server: Spigot 26.3 on Temurin 25, Medieval Factions 7.0.0, ~1,480 chunks loaded, 4 bot-created factions with 84 claims and one alliance, war and vassalage each. Development machine (shared, not a production host); two runs on 2026-10-18. The bots cannot hold chunks loaded on 26.3 (they send no movement packets), so the gate now force-loads 15 × 15 chunks around each faction site to make the loaded set the same on every run:
 
 | | Budget (RFC 0002) | Run 1 (600 s) | Run 2 (300 s) |
 |---|---|---|---|

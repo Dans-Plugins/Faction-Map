@@ -8,3 +8,4 @@ out/
 .vscode/
 tools/smoke/node_modules/
 tools/smoke/work/
+__pycache__/
