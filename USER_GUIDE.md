@@ -7,6 +7,7 @@
 - **Borders**: translucent fences along the edges of each faction's claims.
 - **Faction names**: a label over each faction's densest area. Select a faction in the legend to fly to it.
 - **Relations**: arcs between factions: green for allies, dashed red for war, gold from a vassal to its liege. The legend lists each faction's relations in words.
+- **Homes** (off by default; `factions.showHomes`): a white dot at each faction's home, if it is in the mapped world. The dots belong to the Relations layer and are hidden with it.
 
 Each layer can be switched off in the panel. On a phone the panel is a sheet at the bottom of the screen; **Hide** collapses it.
 
