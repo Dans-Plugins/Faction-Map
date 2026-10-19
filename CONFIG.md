@@ -22,7 +22,7 @@ The server answers GET and HEAD only, serves nothing outside `web/`, never lists
 |---|---|---|
 | `capture.mainThreadBudgetMicros` | `500` | Most main-thread time per tick, in microseconds, spent reading chunks (a tick is 50,000 µs). The time this plugin's event handlers and Medieval Factions reads used that tick counts against it. |
 | `capture.debounceMillis` | `1000` | After a block change, the chunk is re-read once it has been quiet this long… |
-| `capture.maxDelayMillis` | `5000` | …or at most this long after its first change. |
+| `capture.maxDelayMillis` | `5000` | …or at most this long after its first change. A value below `capture.debounceMillis` is treated as `capture.debounceMillis`. |
 | `capture.sweepChunksPerSecond` | `2` | Loaded chunks re-read per second, round-robin, to catch changes that fire no event (`/fill`, WorldEdit, some redstone). With 1,500 loaded chunks, every chunk is re-read about every 12.5 minutes. `0` turns the sweep off. |
 
 ## `factions`
@@ -32,8 +32,8 @@ Only used when Medieval Factions is installed.
 | Key | Default | Meaning |
 |---|---|---|
 | `factions.showNames` | `true` | Show faction names on the map. `false` shows "Faction A", "Faction B"… instead. |
-| `factions.showHomes` | `false` | Show faction homes. |
-| `factions.pollSeconds` | `30` | How often Medieval Factions is re-read. Claims, renames, disbands and relation changes fire events and appear within seconds; `/f unclaimall` and colour changes fire none, so they can take this long. |
+| `factions.showHomes` | `false` | Show faction homes, as white dots on the Relations layer. Only homes in the mapped world are shown. With `false`, homes are never read and never written to the tiles. |
+| `factions.pollSeconds` | `30` | How often Medieval Factions is re-read. Claims, renames, disbands and relation changes fire events and appear within seconds; `/f unclaimall` and colour changes fire none, so they can take this long. Values below `1` are treated as `1`. |
 
 Only factions with at least one claim in the mapped world are shown.
 
