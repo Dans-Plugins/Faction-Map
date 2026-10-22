@@ -16,3 +16,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - `/fmap status|stats|reset|recapture`;
   - usage reporting through the fleet's trace client, off until a key is added;
   - CI: unit tests, a bytecode read-only check, the shared Bukkit API compatibility check for 1.21.11, 26.2 and 26.3, and a bot-driven smoke and performance gate on Spigot 26.3.
+  - release workflows: `dev-release.yml` republishes the rolling `dev` prerelease on every merge to `main`, and `release.yml` attaches a jar to a published release unless one is already attached.
