@@ -18,7 +18,7 @@ The design is RFC 0002 in the Dans-Plugins RFC repository. This is the first mil
 
 ### First Time Installation
 
-1. Download the plugin from the [GitHub releases page](https://github.com/Dans-Plugins/Faction-Map/releases). No release has been published yet; until one is, build it with `./gradlew build` (see [Testing](#testing)).
+1. Download the plugin from the [GitHub releases page](https://github.com/Dans-Plugins/Faction-Map/releases). No stable release has been published yet. Until one is, either take the jar from the `dev` prerelease there, an automated build of `main` that has not been through any release check (back up the server first), or build it with `./gradlew build` (see [Testing](#testing)).
 2. Place the jar in the `plugins` folder of your server.
 3. Optional: install [Medieval Factions](https://github.com/Dans-Plugins/Medieval-Factions) 7.0.0 or later for the faction layers.
 4. Restart your server.
@@ -160,4 +160,4 @@ See the [LICENSE](LICENSE) file for full details.
 
 ## Project Status
 
-This project is in active development: milestone M1 of RFC 0002. Next (M2): the bot-scripted check that every faction change reaches the map, opt-in homes, and the event-plus-poll coverage measured end to end.
+This project is in active development: milestone M1 of RFC 0002. Next (M2): the bot-scripted check that every faction change reaches the map, and the event-plus-poll coverage measured end to end. Opt-in faction homes, also planned for M2, are already available (`factions.showHomes`, off by default).
