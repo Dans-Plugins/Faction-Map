@@ -83,7 +83,7 @@ If you see `BUILD SUCCESSFUL`, the tests have passed. The build downloads the Me
     curl -fsSL -o /tmp/check_api_compat.py https://raw.githubusercontent.com/Dans-Plugins/release-gates/v23/gates/check_api_compat.py
     python3 /tmp/check_api_compat.py --versions minecraft-versions.json target build/libs
 
-The first checks the jar's bytecode against the read-only rules (see [What it guarantees](#what-it-guarantees)); the second checks every Bukkit class, field and method the jar uses against each version in `minecraft-versions.json`. CI runs both after `./gradlew clean build`.
+`check_read_only.py` checks the jar's bytecode against the read-only rules (see [What it guarantees](#what-it-guarantees)); `check_api_compat.py` checks every Bukkit class, field and method the jar uses against each version in `minecraft-versions.json`. CI runs both after `./gradlew clean build`.
 
 ### Smoke and performance gate
 
