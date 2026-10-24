@@ -80,6 +80,10 @@ If you see `BUILD SUCCESSFUL`, the tests have passed. The build downloads the Me
 
     python3 scripts/check_read_only.py --self-test
     python3 scripts/check_read_only.py build/libs
+    curl -fsSL -o /tmp/check_api_compat.py https://raw.githubusercontent.com/Dans-Plugins/release-gates/v23/gates/check_api_compat.py
+    python3 /tmp/check_api_compat.py --versions minecraft-versions.json target build/libs
+
+The first checks the jar's bytecode against the read-only rules (see [What it guarantees](#what-it-guarantees)); the second checks every Bukkit class, field and method the jar uses against each version in `minecraft-versions.json`. CI runs both after `./gradlew clean build`.
 
 ### Smoke and performance gate
 
@@ -115,7 +119,7 @@ The server listens on `localhost:25565` and the map on `http://localhost:8199/`.
 
 #### Reloading the Plugin
 
-After a rebuild, copy the new jar in and restart the server:
+To rebuild the plugin, copy the new jar into the running container and restart the server:
 
     ./reload-plugin.sh
 

@@ -49,5 +49,6 @@ The plugin must never change a world or a Medieval Factions save. CI enforces th
 
 - Unit tests: `./gradlew clean test` (Windows: `.\gradlew.bat clean test`).
 - Read-only check: `python3 scripts/check_read_only.py --self-test && python3 scripts/check_read_only.py build/libs`.
+- Bukkit API check against every version in `minecraft-versions.json`: the last step of the `Build` workflow (`.github/workflows/build.yml`), which downloads `check_api_compat.py` from [release-gates](https://github.com/Dans-Plugins/release-gates) and runs it on `build/libs`.
 - Smoke and performance gate on a throwaway server: see the `Smoke` workflow (`.github/workflows/smoke.yml`) for the exact steps, and [`tools/smoke/gate.py`](tools/smoke/gate.py). Never point the bots or the gate at a real server: they create factions, claim land and set off TNT.
-- Manual testing with Docker: `./gradlew build`, `cp sample.env .env`, `./up.sh`; reload with `./reload-plugin.sh`; stop with `./down.sh`.
+- Manual testing with Docker: `./gradlew build`, `cp sample.env .env`, `./up.sh`; rebuild and reload with `./reload-plugin.sh`; stop with `./down.sh`.
