@@ -18,7 +18,7 @@ The design is RFC 0002 in the Dans-Plugins RFC repository. This is the first mil
 
 ### First Time Installation
 
-1. Download the plugin from the [GitHub releases page](https://github.com/Dans-Plugins/Faction-Map/releases). No stable release has been published yet. Until one is, either take the jar from the `dev` prerelease there, an automated build of `main` that has not been through any release check (back up the server first), or build it with `./gradlew build` (see [Testing](#testing)).
+1. Download the plugin from the [GitHub releases page](https://github.com/Dans-Plugins/Faction-Map/releases). Take the jar from the latest stable release. The `dev` prerelease there is an automated build of `main` that has not been through any release check: use it only to try unreleased changes, and back up the server first. You can also build the jar with `./gradlew build` (see [Testing](#testing)).
 2. Place the jar in the `plugins` folder of your server.
 3. Optional: install [Medieval Factions](https://github.com/Dans-Plugins/Medieval-Factions) 7.0.0 or later for the faction layers.
 4. Restart your server.
