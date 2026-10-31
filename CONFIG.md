@@ -41,7 +41,7 @@ Only factions with at least one claim in the mapped world are shown.
 
 | Key | Default | Meaning |
 |---|---|---|
-| `usage-reporting.enabled` | `true` | Send a `startup` event when the plugin is enabled and a `command` event per `/fmap` use. |
+| `usage-reporting.enabled` | `true` | Send a `startup` event when the plugin is enabled and a `command` event each time a player runs `/fmap` (the console and command blocks are not counted). |
 | `usage-reporting.endpoint` | `https://trace.danielstephenson.dev` | Where events go. |
 | `usage-reporting.key` | `""` | Identifies this plugin to the trace server. Empty means reporting is off. |
 
