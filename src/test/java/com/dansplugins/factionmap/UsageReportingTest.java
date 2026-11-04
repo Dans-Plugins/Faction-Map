@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -49,11 +51,38 @@ class UsageReportingTest {
     }
 
     @Test
+    void aKnownSubcommandIsNamedInTheEvent() {
+        assertEquals(Optional.of("fmap recapture"), UsageReporting.commandEventName(true, "recapture"));
+    }
+
+    @Test
+    void textThatIsNotASubcommandIsNeverReported() {
+        assertEquals(Optional.empty(), UsageReporting.commandEventName(true, "steve"));
+        assertEquals(Optional.empty(), UsageReporting.commandEventName(true, ""));
+    }
+
+    @Test
+    void commandsThatNoPlayerRanAreNotReported() {
+        assertEquals(Optional.empty(), UsageReporting.commandEventName(false, "status"));
+    }
+
+    @Test
+    void theReportedSubcommandsAreTheOnesPluginYmlLists() {
+        String usage = pluginYml().getString("commands.fmap.usage");
+        String list = usage.substring(usage.indexOf('[') + 1, usage.indexOf(']'));
+        assertEquals(Set.of(list.split("\\|")), UsageReporting.SUBCOMMANDS);
+    }
+
+    @Test
     void pluginYmlKeepsMedievalFactionsOptional() {
-        YamlConfiguration p = YamlConfiguration.loadConfiguration(new InputStreamReader(
-                UsageReportingTest.class.getResourceAsStream("/plugin.yml"), StandardCharsets.UTF_8));
+        YamlConfiguration p = pluginYml();
         assertEquals("FactionMap", p.getString("name"));
         assertTrue(p.getStringList("softdepend").contains("MedievalFactions"));
         assertFalse(p.isSet("depend"), "the map works without Medieval Factions");
+    }
+
+    private static YamlConfiguration pluginYml() {
+        return YamlConfiguration.loadConfiguration(new InputStreamReader(
+                UsageReportingTest.class.getResourceAsStream("/plugin.yml"), StandardCharsets.UTF_8));
     }
 }

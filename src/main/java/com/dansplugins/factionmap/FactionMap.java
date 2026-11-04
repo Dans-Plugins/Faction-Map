@@ -317,10 +317,8 @@ public final class FactionMap extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         String sub = args.length == 0 ? "status" : args[0].toLowerCase(Locale.ROOT);
-        // Console, command-block and plugin-dispatched commands are not counted.
-        if (sender instanceof Player) {
-            trace.report("command", 1.0, Collections.singletonMap("name", "fmap " + sub));
-        }
+        UsageReporting.commandEventName(sender instanceof Player, sub)
+                .ifPresent(name -> trace.report("command", 1.0, Collections.singletonMap("name", name)));
         switch (sub) {
             case "status" -> {
                 Map<String, Object> s = status();
