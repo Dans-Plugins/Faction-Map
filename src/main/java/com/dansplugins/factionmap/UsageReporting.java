@@ -6,6 +6,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /** Fleet usage reporting (trace): loud on every start, one step to turn off. */
 final class UsageReporting {
@@ -13,8 +15,20 @@ final class UsageReporting {
     static final String ENDPOINT_KEY = "usage-reporting.endpoint";
     static final String KEY_KEY = "usage-reporting.key";
     static final String DEFAULT_ENDPOINT = "https://trace.danielstephenson.dev";
+    static final Set<String> SUBCOMMANDS = Set.of("status", "stats", "reset", "recapture");
 
     private UsageReporting() {
+    }
+
+    /**
+     * The name a {@code command} event carries for one {@code /fmap}, if it should be reported at all. Only
+     * players' commands are counted, and only known subcommands are named, so text typed after
+     * {@code /fmap} never leaves the server.
+     *
+     * @param subcommand the lower-cased first argument
+     */
+    static Optional<String> commandEventName(boolean byPlayer, String subcommand) {
+        return byPlayer && SUBCOMMANDS.contains(subcommand) ? Optional.of("fmap " + subcommand) : Optional.empty();
     }
 
     /**

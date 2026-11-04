@@ -6,9 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Usage reporting no longer sends text that is not a subcommand: `/fmap <anything else>` is not reported.
+
+## [0.2.1] - 2026-10-30
+
 ### Changed
 
-- Usage reporting now counts a `command` event only when a player runs the command; console, command-block and plugin-dispatched commands are no longer reported.
+- Usage reporting now counts a `command` event only when a player runs the command; console and command-block commands are no longer reported.
+
+## [0.2.0] - 2026-10-29
+
+### Changed
+
+- The vendored trace client is now 0.7.0, which coalesces identical usage reports sent within 60 seconds into one event carrying their count.
 
 ## [0.1.0] - 2026-10-25
 
