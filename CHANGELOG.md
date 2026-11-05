@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - Usage reporting no longer sends text that is not a subcommand: `/fmap <anything else>` is not reported.
+- `stats.json` is now replaced atomically, so a script reading it never sees an empty or partial file.
 
 ## [0.2.1] - 2026-10-30
 

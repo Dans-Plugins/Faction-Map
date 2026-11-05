@@ -5,6 +5,7 @@ import com.dansplugins.factionmap.capture.LoadedChunkReader;
 import com.dansplugins.factionmap.factions.FactionSnapshot;
 import com.dansplugins.factionmap.factions.MfReader;
 import com.dansplugins.factionmap.stats.Stats;
+import com.dansplugins.factionmap.stats.StatsFile;
 import com.dansplugins.factionmap.surface.Palette;
 import com.dansplugins.factionmap.surface.SurfaceColumns;
 import com.dansplugins.factionmap.tiles.TileStore;
@@ -21,7 +22,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -283,8 +283,7 @@ public final class FactionMap extends JavaPlugin {
         try {
             Map<String, Object> out = status();
             out.put("stats", stats.summary());
-            Path p = getDataFolder().toPath().resolve("stats.json");
-            Files.writeString(p, new GsonBuilder().setPrettyPrinting().create().toJson(out), StandardCharsets.UTF_8);
+            StatsFile.write(getDataFolder().toPath(), out);
         } catch (IOException | RuntimeException e) {
             getLogger().log(Level.FINE, "stats.json not written", e);
         }
