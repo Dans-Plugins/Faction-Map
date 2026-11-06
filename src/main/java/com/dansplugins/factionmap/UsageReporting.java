@@ -53,15 +53,24 @@ final class UsageReporting {
                 .logger(plugin.getLogger())
                 .build();
         if (trace.isEnabled()) {
-            plugin.getLogger().info("Usage reporting is on: " + plugin.getName() + " sends its name and version to"
-                    + " https://trace.danielstephenson.dev, plus a random server ID (server-id in plugins/trace/config.yml)"
-                    + " - nothing about players. Turn it off with usage-reporting.enabled: false in this plugin's"
-                    + " config.yml, or for every plugin with enabled: false in plugins/trace/config.yml."
-                    + " Details: https://danielstephenson.dev/usage-reporting");
+            plugin.getLogger().info(reportingOnNotice(plugin.getName()));
         } else {
             plugin.getLogger().info("Usage reporting is off (" + trace.disabledReason() + ").");
         }
         return trace;
+    }
+
+    /**
+     * The line printed at every start while reporting is on. The smoke workflow fails on the prefix
+     * {@code Usage reporting is on}, so that prefix has to stay.
+     */
+    static String reportingOnNotice(String pluginName) {
+        return "Usage reporting is on: " + pluginName + " sends its name and version to"
+                + " https://trace.danielstephenson.dev, plus a random server ID (server-id in plugins/trace/config.yml),"
+                + " and each /fmap a player runs sends one event naming the subcommand"
+                + " - nothing about players. Turn it off with usage-reporting.enabled: false in this plugin's"
+                + " config.yml, or for every plugin with enabled: false in plugins/trace/config.yml."
+                + " Details: https://danielstephenson.dev/usage-reporting";
     }
 
     /**

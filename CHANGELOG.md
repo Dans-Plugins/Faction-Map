@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- The `config.yml` comment and the console line at start now say that each `/fmap` a player runs sends one event naming the subcommand, as the README and `CONFIG.md` already did.
+- The `/fmap` usage string now lists `/fmap stats json`.
+
+## [0.2.2] - 2026-11-06
+
+### Fixed
+
 - Usage reporting no longer sends text that is not a subcommand: `/fmap <anything else>` is not reported.
 - `stats.json` is now replaced atomically, so a script reading it never sees an empty or partial file.
 
