@@ -9,7 +9,7 @@ website: https://github.com/Dans-Plugins/Faction-Map
 commands:
   fmap:
     description: Faction Map status and performance figures.
-    usage: /fmap [status|stats|reset|recapture]
+    usage: /fmap [status|stats|stats json|reset|recapture]
     permission: factionmap.admin
 permissions:
   factionmap.admin:
