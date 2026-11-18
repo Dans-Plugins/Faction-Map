@@ -33,7 +33,9 @@ factions:
 
 # Usage reporting. When the plugin is enabled, a small event (plugin name,
 # event name, plugin version) is sent to the author's trace server so it is
-# known which plugins are actually in use. Each event also carries a random
+# known which plugins are actually in use, and each /fmap a player runs sends
+# one event naming the subcommand (the console, command blocks and text that
+# is not a subcommand are not counted). Each event also carries a random
 # server ID (the server-id line in plugins/trace/config.yml) so servers can be
 # counted; it identifies no person, account or IP address. Nothing about
 # players is included, and nothing else about the server apart from any tags

@@ -3,10 +3,14 @@ package com.dansplugins.factionmap;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -14,6 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** The bundled config and how the usage-reporting block reaches a config.yml that lacks it. */
 class UsageReportingTest {
+    private static final String COMMAND_DISCLOSURE = "each /fmap a player runs sends one event naming the subcommand";
+
     static YamlConfiguration bundled() {
         return YamlConfiguration.loadConfiguration(new InputStreamReader(
                 UsageReportingTest.class.getResourceAsStream("/config.yml"), StandardCharsets.UTF_8));
@@ -70,7 +76,31 @@ class UsageReportingTest {
     void theReportedSubcommandsAreTheOnesPluginYmlLists() {
         String usage = pluginYml().getString("commands.fmap.usage");
         String list = usage.substring(usage.indexOf('[') + 1, usage.indexOf(']'));
-        assertEquals(Set.of(list.split("\\|")), UsageReporting.SUBCOMMANDS);
+        Set<String> subcommands = Arrays.stream(list.split("\\|"))
+                .map(entry -> entry.split(" ")[0])
+                .collect(Collectors.toSet());
+        assertEquals(subcommands, UsageReporting.SUBCOMMANDS);
+    }
+
+    @Test
+    void pluginYmlListsTheJsonFormOfStats() {
+        assertTrue(pluginYml().getString("commands.fmap.usage").contains("stats json"));
+    }
+
+    @Test
+    void theConsoleLineDisclosesCommandEvents() {
+        String notice = UsageReporting.reportingOnNotice("FactionMap");
+        assertTrue(notice.startsWith("Usage reporting is on"), "smoke.yml greps the console for this prefix");
+        assertTrue(notice.contains(COMMAND_DISCLOSURE), notice);
+    }
+
+    @Test
+    void theConfigCommentDisclosesCommandEvents() throws IOException {
+        try (InputStream in = UsageReportingTest.class.getResourceAsStream("/config.yml")) {
+            String text = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            String unwrapped = text.replace("\n# ", " ");
+            assertTrue(unwrapped.contains(COMMAND_DISCLOSURE), "the comment above usage-reporting");
+        }
     }
 
     @Test
