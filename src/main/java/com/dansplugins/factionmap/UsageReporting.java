@@ -1,10 +1,12 @@
 package com.dansplugins.factionmap;
 
 import com.dansplugins.factionmap.trace.TraceClient;
+import com.dansplugins.factionmap.trace.UsageReportingSetting;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -37,7 +39,10 @@ final class UsageReporting {
      * {@code plugins/trace/config.yml} is created if absent and honoured.
      */
     static TraceClient start(JavaPlugin plugin) {
-        if (ensureBlockOnDisk(plugin.getConfig())) {
+        File configFile = new File(plugin.getDataFolder(), "config.yml");
+        // Bukkit loads a config.yml it cannot parse as empty, so the block looks missing even when the
+        // operator wrote enabled: false in it; saving the defaults would replace the whole file.
+        if (!UsageReportingSetting.isUnparseable(configFile) && ensureBlockOnDisk(plugin.getConfig())) {
             plugin.saveConfig();
         }
         // The one-argument getters, deliberately: they fall through to the bundled config.yml for a key
@@ -48,7 +53,9 @@ final class UsageReporting {
         TraceClient trace = TraceClient.builder(endpoint != null ? endpoint : DEFAULT_ENDPOINT, plugin.getName(),
                         plugin.getDescription().getVersion())
                 .key(key != null ? key : "")
-                .enabled(config.getBoolean(ENABLED_KEY))
+                // Fails closed: only true, on or yes is on (getBoolean() would read a quoted "false" as the
+                // bundled true), and an opt-out in config.yml on disk wins over the loaded copy.
+                .enabled(UsageReportingSetting.isEnabled(config, configFile))
                 .serverWideConfig(plugin.getDataFolder().getParentFile())
                 .logger(plugin.getLogger())
                 .build();
