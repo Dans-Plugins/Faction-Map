@@ -41,7 +41,7 @@ Only factions with at least one claim in the mapped world are shown.
 
 | Key | Default | Meaning |
 |---|---|---|
-| `usage-reporting.enabled` | `true` | Send a `startup` event when the plugin is enabled and a `command` event each time a player runs `/fmap`, naming the subcommand (the console, command blocks and text that is not a subcommand are not counted). |
+| `usage-reporting.enabled` | `true` | Send a `startup` event when the plugin is enabled and a `command` event each time a player runs `/fmap`, naming the subcommand (the console, command blocks and text that is not a subcommand are not counted). Set to `false` to turn it off. Only `true`, `on` or `yes` turns it on; any other value, including a quoted `"false"`, turns it off, and the plugin never writes the switch back on once it is off in the file. A `config.yml` with a YAML error in it is never overwritten, and reporting stays off until the error is fixed. |
 | `usage-reporting.endpoint` | `https://trace.danielstephenson.dev` | Where events go. |
 | `usage-reporting.key` | `""` | Identifies this plugin to the trace server. Empty means reporting is off. |
 

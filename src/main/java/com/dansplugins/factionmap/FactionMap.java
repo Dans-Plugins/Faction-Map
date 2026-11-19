@@ -10,6 +10,7 @@ import com.dansplugins.factionmap.surface.Palette;
 import com.dansplugins.factionmap.surface.SurfaceColumns;
 import com.dansplugins.factionmap.tiles.TileStore;
 import com.dansplugins.factionmap.trace.TraceClient;
+import com.dansplugins.factionmap.trace.UsageReportingSetting;
 import com.dansplugins.factionmap.web.StaticWebServer;
 import com.google.gson.GsonBuilder;
 import org.bukkit.World;
@@ -20,6 +21,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -159,6 +161,24 @@ public final class FactionMap extends JavaPlugin {
             }
         }
         trace.report("startup");
+    }
+
+    /**
+     * Every save of config.yml goes through here. A file Bukkit could not parse was loaded as
+     * empty, so saving would replace it with the bundled defaults, usage reporting switched on
+     * included; it is left alone instead. An opt-out written into the file by hand while the
+     * server runs is carried into the loaded copy first, so a save cannot turn reporting back on.
+     */
+    @Override
+    public void saveConfig() {
+        File configFile = new File(getDataFolder(), "config.yml");
+        if (UsageReportingSetting.isUnparseable(configFile)) {
+            getLogger().severe("config.yml could not be read, so it was not overwritten. Fix the YAML error in it and restart; "
+                    + "until then the defaults are used, and usage reporting is off.");
+            return;
+        }
+        UsageReportingSetting.keepOptOutFromDisk(getConfig(), configFile);
+        super.saveConfig();
     }
 
     @Override
